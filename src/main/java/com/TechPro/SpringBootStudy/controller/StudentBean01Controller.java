@@ -1,15 +1,12 @@
-package com.TechPro.SpringBootStudy;
+package com.TechPro.SpringBootStudy.controller;
 
-import org.hibernate.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.List.*;
 
 //@Controller//SpringBoot bu class'ı control layer  olarak tanımlar
 @RestController
@@ -64,5 +61,33 @@ public class StudentBean01Controller {
                 (new StudentBean01("hatice  hanım", 27, "***"))).collect(Collectors.toList()); //java 8 de böyle ama java 11 de List.of
 
     }
+
+    //Loose coupling...
+    @Autowired   //Not:@Autowired-->Loose coupling de her variable icin kullanilmali
+    StudentBean02 t;
+    @GetMapping(path = "/getStudy")
+    public String getStudy01(){
+        return t.study();
+    }
+
+
+    @Autowired
+     @Qualifier  (value="studentBean02")     //@Qualifier-->@Autowired     ile tanimlanan obj cretae edilecek data type ni tanimlar.Tanimlanacak data type annaotation a parametre olur
+                //bu interfaceden oluşan deklarasyona IOC’deki studentBean01 veya studentBean02 adındaki bekleyen variable’lardan hangisini atayacağına karar veriyoruz qualifier ile
+    StudentInterface u;
+    @GetMapping(path = "/getStudy1")
+    public String getStudy02(){
+        return u.study();
+    }
+
+
+
+
+
+
+
+
+
+
 
 }

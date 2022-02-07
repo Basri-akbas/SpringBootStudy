@@ -1,9 +1,9 @@
-package com.TechPro.SpringBootStudy;
+package com.TechPro.SpringBootStudy.controller;
 
 import org.springframework.stereotype.Component;
 
 @Component    //bilesen tamamlayici:kullanilan class dan obj IOC create eder
-public class StudentBean01 {
+public class StudentBean01 implements StudentInterface{
 
     //pojo =plan old java obj
 
@@ -52,5 +52,10 @@ public class StudentBean01 {
                 ", age=" + age +
                 ", id='" + id + '\'' +
                 '}';
+    }
+
+    @Override
+    public String study() {
+        return "StudentBean01 den geliyorum :-)";
     }
 }
