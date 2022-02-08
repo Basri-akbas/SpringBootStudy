@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class StudentBean03Controller {
 
@@ -23,4 +25,10 @@ public class StudentBean03Controller {
     public StudentBean03 getStudentId(@PathVariable Long id){
         return  std.getStudentById(id);
     }
+
+    @GetMapping(path="/getStudentList")
+    public List<StudentBean03> getStudentHepsi(){
+        return std.getAllStudent();
+    }
+
 }
