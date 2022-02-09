@@ -1,6 +1,4 @@
-package com.TechPro.SpringBootStudy.controller_service_repository;
-
-import org.springframework.stereotype.Component;
+package com.TechPro.SpringBootStudy.basic_authentication;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,7 +8,7 @@ import java.time.Period;
 
 @Entity
 @Table(name="students")
-public class StudentBean04 {
+public class StudentBean05 {
     @Id
     private Long id;
 
@@ -24,16 +22,16 @@ public class StudentBean04 {
 
     private String errMsg;
 
-    public StudentBean04(){
-        this.errMsg="Agam senin ogrenci arazi  :-(";
+    public StudentBean05(){
+        this.errMsg="Agam senin ogrenci arazi yokkkkkkkkkkk :-(";
     }
 
-    public StudentBean04(Long id, String name, String email, LocalDate dob) {
+    public StudentBean05(Long id, String name, String email, LocalDate dob) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.dob = dob;
-        this.errMsg="Devamke...........";
+        this.errMsg="Devamke agam...........";
     }
 
     public Long getId() {
@@ -90,7 +88,7 @@ public class StudentBean04 {
 
     @Override
     public String toString() {
-        return "StudentBean04{" +
+        return "StudentBean05{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +

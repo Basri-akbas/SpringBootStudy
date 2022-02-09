@@ -9,13 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class StudentBean04Controller {
     private StudentBean04Service stdSrvc;//service layer' ulaşmak için obj create edildi
-    @Autowired
     public StudentBean04Controller(StudentBean04Service stdSrvc){
         this.stdSrvc = stdSrvc;
     }
 
     //bu method id ile ogrc returnn eden service methodu call edecek
-    @GetMapping(path = "/@RestController{id}")
+    @GetMapping(path = "/selectStudentById/{id}")
     public StudentBean04 selectStudentById(@PathVariable Long id){
 
         return stdSrvc.selectStudentById(id);
