@@ -3,9 +3,9 @@ package com.TechPro.SpringBootStudy.basic_authentication;
 import com.TechPro.SpringBootStudy.controller_service_repository.StudentBean04;
 import com.TechPro.SpringBootStudy.controller_service_repository.StudentBean04Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class StudentBean05Controller {
@@ -21,5 +21,16 @@ public class StudentBean05Controller {
         return stdSrvc.selectStudentById(id);
     }
 
+    @GetMapping(path = "/selectAllStudents")
+    public List<StudentBean05> selectAllStudents() {
+        return stdSrvc.selectAllStudents();
+    }
+
+    @PutMapping(path = "/updateFullyStudentById/{id}")
+    public StudentBean05 updatefulltStudentIdile(@PathVariable Long id,@RequestBody StudentBean05 newStd){
+
+
+        return stdSrvc.updateFullyStudentById(id,newStd);
+    }
 
 }

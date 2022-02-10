@@ -1,4 +1,4 @@
-package com.TechPro.SpringBootStudy.basic_authentication;
+package com.TechPro.SpringBootStudy.basicAuto_yeni;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,29 +11,29 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-@Configuration
+@Configuration //Class'ı config olarak tanımlar class name'ın config kısmı
 @EnableWebSecurity
-public class AppicationSecurityconfig extends WebSecurityConfigurerAdapter {
+//Tanımlı oldugu Class'ta form based security yerine(basic authentication) configure(ayaralama) eder
+public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordConfig passEncode;//final  obj bir deger almalı bu degeri alacagı cons create edilmeli
     @Autowired
-    public AppicationSecurityconfig(PasswordConfig passEncode) {//PasswordConfig class'dan create edilen  obj deger atayan cons.
-        this.passEncode = passEncode;
+    public ApplicationSecurityConfig(PasswordConfig passEncode){//PasswordConfig class'dan create edilen  obj deger atayan cons.
+        this.passEncode=passEncode;
     }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.
-                csrf().disable().
-                authorizeRequests().   //Requstler icin yetki sorgula (get put patch delete post)
-                antMatchers("/","index","/css/*","/js/*").
-                permitAll().
-                anyRequest(). // her request icin
-                authenticated(). // kullanici sorgula
-                and(). // neye gore
-                httpBasic(); //httpBasic'e gore
-        // her request'te APP username ve passv.(security) control edilmeli logout yapmaya gerek kalmayacak
-        // Benim istedigim kisiler apt girdikten sonra herkes yetki sahibi olsun
+                authorizeRequests().//her request için//Requestler için yetki sorgula (get put patch delete post)
+                //antMatchers("/", "index", "/css/*", "/js/*").permitAll().//antMatchers() method parametresindeki url'lere izin(username pass sorgusu yapma) ver
+                        anyRequest().//her request için
+                authenticated().//kullanıcı sorgula
+                and().//neye göre
+                httpBasic();//httpBasic 'e göre
+        //her request'te APP username ve pass(security) control edilmeli logout yapmaya gerek kalmayacak
+        //Benim istedigim kişiler apt girdikten sonra herkes yetki sahibi olsun
     }
 
     @Override
@@ -48,4 +48,5 @@ public class AppicationSecurityconfig extends WebSecurityConfigurerAdapter {
         // return student;//returm uyumsuzluk hatası
         return new InMemoryUserDetailsManager(student,admin,hanimaga);
     }
+
 }
