@@ -4,6 +4,7 @@ import com.TechPro.SpringBootStudy.basicAuto_yeni.CBean01;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
@@ -17,6 +18,8 @@ public class StudentBean05Service {
     public StudentBean05Service(StudentBean05Repository studentRepo){
         this.studentRepo = studentRepo;
     }
+
+    //************************************ GET BY ID *************************************************************************************
     //Bu method id ile ögrc return edecek
     public StudentBean05 selectStudentById(Long id){
         // return studentRepo.findById(id).get();--> olmayan id hata verir code kırlrı bununiçin kontrol if çalışmalı
@@ -27,13 +30,14 @@ public class StudentBean05Service {
         return new StudentBean05();//isteen id yoksa bos cons run edilecek
     }//service layer'de repository'den alınan datalar methodda çalıştırıldı. bu metthod controlle layer'da call edilmeli
 
+    //************************************************* GET ALL ******************************************************************************************************
     //bu get method tum ogrc return eder
     public List<StudentBean05> selectAllStudents() {
         return studentRepo.findAll();
 
     }
 
-
+    //******************************************** PUT *********************************************************************************************
     // Bu method var olan ogrc tum datalarını (PUT:fully update) update eder
     public StudentBean05 updateFullyStudentById(Long id, StudentBean05 kullanıcınınOgrc) {//kullanıcıdan gelen id ve yeni bilgilerle id li studenti güncelliyecez
         StudentBean05 eskiOgrc = studentRepo.
@@ -82,11 +86,95 @@ public class StudentBean05Service {
             eskiOgrc.setDob(kullanıcınınOgrc.getDob());
 
         }
-        //dob aupdate edilecek
+
         return studentRepo.save(eskiOgrc);
     }
 
+    //*********************************** DELETE **************************************************************************************************************
+    //Bu met id ile data(student obj) delete edecek
+    public String deletStudentById(Long id) {
+        if (!studentRepo.existsById(id)) {//id'si verilen obj'nin DB'de varlıgını kontrol eder-->id'li ogrc yoksa code excute stop App stop
+            throw new IllegalStateException("AGAM niddin " + id + " li ogrc araziii");
+        }
+        studentRepo.deleteById(id);//id'Li oğrs repodan call edip delet eder
+        return "AGAM " + id + "li ogrc sizlere omur...";//action hakkında bilgi verir
+    }//bu method run için controller da call edilmeli
 
+    //*************************************** PATCH ************************************************************************************************************
+    //Bu method obj'lerin PACTH(partial kısmi) datalarını update eder
+    public StudentBean05 updatePatchStudentById(long id, StudentBean05 newStudent) {
+        StudentBean05 existingStudenById = studentRepo.
+                                                 findById(id).
+                                                 orElseThrow(() -> new IllegalStateException("id'si " + id + " olan ogrc yok"));//Update edilecek ogrc varlıgı kontrol ediliyor
+        //student email update edilecek BRD
+
+        //email aupdate edilecek
+        /*
+        brd:
+
+        1) email tekararlı olmaz uniq-->EXCEPTION
+        2) email gecerli (@ içermeli) olmalı-->EXCEPTION
+        3) email null olamaz -->EXCEPTION
+        4) email eski ve yeni aynı ise gereksiz işlem için update etmemeli
+         */
+        if (newStudent.getEmail() == null) {
+            newStudent.setEmail("");
+        }
+        Optional<StudentBean05> emailOLaneskiOgrc = studentRepo.findStudentBean05ByEmail(newStudent.getEmail());
+        if (emailOLaneskiOgrc.isPresent()) {//1. sart kontrol edildi eger emailolanogc containerde varsa
+            throw new IllegalStateException("daha once bu email kullanıldı");
+        } else if (!newStudent.getEmail().contains("@") && newStudent.getEmail() != "") {//2 . sart kontrol edilecek
+            throw new IllegalStateException("@ karakteri kullanmalısınız");
+        } else if (newStudent.getEmail() == null) {//3. sart kontrol edilecek
+            throw new IllegalStateException("mutlaka bir email girmelisiniz");
+        } else if (!newStudent.getEmail().equals(existingStudenById.getEmail())) {
+            existingStudenById.setEmail(newStudent.getEmail());
+        } else {
+            throw new IllegalStateException("aynı e mail update edilmez");
+        }
+
+        return studentRepo.save(existingStudenById);//update edileck ogrc action sonrası save edilerel return edilir
+    }//Bu Method controller layer'e call edilmeli
+
+
+        //********************************** NEW STUDENT ***********************************************************************************************
+        //Bu Method yeni bir student obj cretae eder
+
+    public StudentBean05 addStudent(StudentBean05 newStudent) throws ClassNotFoundException, SQLException {
+        //ogrc email datası girilecek
+        //e mail tekrarsız olmalı BRD
+        Optional<StudentBean05> existingStudenById= studentRepo.findStudentBean05ByEmail(newStudent.getEmail());
+        if (existingStudenById.isPresent()){//eski ogrc email varsa exc
+            throw new IllegalStateException("AGAM bu "+newStudent.getEmail()+" 2. el sana ajente bir imeyıl lazım");
+
+        }
+        //ogrc name datası giriliecek
+        if (newStudent.getName()==null) {//yeni ogrc henus name girmemis-->excp
+            throw new IllegalStateException("AGAM adın yoksa sen de yoksun  :-( ");
+        }
+
+        //her yeni ogrc için app uniq id  cretae etmeli...
+        /*
+        LOGİC : DB'de varolan max id get edip +1 hali yeni id assaign edilmeli
+         */
+        //DB'ye JDBC connection ...
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/sys?serverTimezone=UTC","root","Hsnbsry0909+");
+        Statement st = con.createStatement();
+
+        //max id get içinSQL query komutla
+        String sqlQueryForMaxId="select max(id) from students";//birden cok (id tek olacagı içim bizm sorguda tek verir)sonuc  satır verir
+        ResultSet result= st.executeQuery(sqlQueryForMaxId);//query sonrası satırlerı return eder loop ile istene  satır alınır
+        Long maxId=0l;
+        while(result.next()){//next() pointer bir sonraki satıra gider onceki satur return eder
+            maxId= result.getLong(1);
+        }
+        newStudent.setId(maxId+1);
+        newStudent.setYas(newStudent.getYas());
+        newStudent.setErrMsg("AGAM müjde nur topu gibi ogrencin oldii");
+
+        return studentRepo.save(newStudent);
+    }//bu method controller call edilmeli
 
 
 

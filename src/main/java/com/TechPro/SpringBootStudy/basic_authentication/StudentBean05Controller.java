@@ -3,8 +3,11 @@ package com.TechPro.SpringBootStudy.basic_authentication;
 import com.TechPro.SpringBootStudy.controller_service_repository.StudentBean04;
 import com.TechPro.SpringBootStudy.controller_service_repository.StudentBean04Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -16,21 +19,42 @@ public class StudentBean05Controller {
 
     //bu method id ile ogrc returnn eden service methodu call edecek
     @GetMapping(path = "/selectStudentById/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STUDENT')")
     public StudentBean05 selectStudentById(@PathVariable Long id){
 
         return stdSrvc.selectStudentById(id);
     }
 
     @GetMapping(path = "/selectAllStudents")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STUDENT')")//bu metodu role gore yetkilendir
     public List<StudentBean05> selectAllStudents() {
+
         return stdSrvc.selectAllStudents();
     }
 
     @PutMapping(path = "/updateFullyStudentById/{id}")
-    public StudentBean05 updatefulltStudentIdile(@PathVariable Long id,@RequestBody StudentBean05 newStd){
-
+    @PreAuthorize("hasAuthority('student:write')")//bu metodu permissiona gore izne gore yetkilendir
+    public StudentBean05 updatefulltStudentIdile(@PathVariable Long id,@Validated @RequestBody StudentBean05 newStd){
 
         return stdSrvc.updateFullyStudentById(id,newStd);
+    }
+
+    @DeleteMapping(path="/deleteStudentById/{id}")
+    public String deleteStdntById(@PathVariable Long id){
+        return stdSrvc.deletStudentById(id);//service layer method call
+    }
+
+    @PatchMapping(path="/updatePartialStudentById/{id}")
+    @PreAuthorize("hasAuthority('student:write')")
+    public StudentBean05 updatePartialStdntById( @PathVariable Long id,@Validated  @RequestBody StudentBean05 newStdnt){
+
+        return  stdSrvc.updatePatchStudentById(id,newStdnt);
+
+    }
+    @PostMapping(path="/addStudent")
+    @PreAuthorize("hasAuthority('student:write')")
+    public StudentBean05 addStndt(@Validated @RequestBody StudentBean05 newStdnt) throws SQLException, ClassNotFoundException {
+        return stdSrvc.addStudent(newStdnt);
     }
 
 }
